@@ -1,0 +1,5 @@
+testuser Cleartext-Password := "password123"
+  Reply-Message := "Welcome, %{User-Name}"
+
+bob Cleartext-Password := "hello"
+  Reply-Message := "Hello Bob"

@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  freeradius:
+    image: freeradius/freeradius-server:latest
+    container_name: freeradius
+    restart: unless-stopped
+    ports:
+      - "1812:1812/udp"
+      - "1813:1813/udp"
+    environment:
+      - TZ=UTC
+    volumes:
+      - type: bind
+        source: ./config/clients.conf
+        target: /etc/freeradius/clients.conf
+        is_directory: false
+      - type: bind
+        source: ./config/authorize
+        target: /etc/freeradius/mods-config/files/authorize
+        is_directory: false
+      - type: bind
+        source: ./logs
+        target: /var/log/freeradius
+        is_directory: true
+    healthcheck:
+      test: ["CMD", "radclient", "-c", "1", "localhost:1812", "status", "testing123"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
