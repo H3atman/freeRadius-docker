@@ -5,12 +5,9 @@ COPY raddb/clients.conf /etc/freeradius/clients.conf
 COPY raddb/mods-config/files/authorize /etc/freeradius/mods-config/files/authorize
 COPY raddb/radiusd.conf.d/logging.conf /etc/freeradius/radiusd.conf.d/logging.conf
 
-# Enable SQL module
-RUN ln -s /etc/freeradius/mods-available/sql /etc/freeradius/mods-enabled/sql && \
-    ln -s /etc/freeradius/mods-available/sqlcounter /etc/freeradius/mods-enabled/sqlcounter
-
-# Copy SQL module configuration
-COPY raddb/mods-config/sql/default /etc/freeradius/mods-available/
+# Enable SQL module (symlinks already exist in image)
+RUN ln -sf /etc/freeradius/mods-available/sql /etc/freeradius/mods-enabled/sql && \
+    ln -sf /etc/freeradius/mods-available/sqlcounter /etc/freeradius/mods-enabled/sqlcounter
 
 # Set proper permissions
 RUN chmod 644 /etc/freeradius/clients.conf && \
