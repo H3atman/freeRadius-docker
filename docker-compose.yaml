@@ -11,14 +11,11 @@ services:
     environment:
       - TZ=UTC
     volumes:
+      # Mount entire config directory instead of individual files
       - type: bind
-        source: ./config/clients.conf
-        target: /etc/freeradius/clients.conf
-        is_directory: false
-      - type: bind
-        source: ./config/authorize
-        target: /etc/freeradius/mods-config/files/authorize
-        is_directory: false
+        source: ./config
+        target: /etc/freeradius/mods-config/files
+        is_directory: true
       - type: bind
         source: ./logs
         target: /var/log/freeradius
@@ -28,4 +25,3 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
