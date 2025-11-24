@@ -11,17 +11,11 @@ services:
     environment:
       - TZ=UTC
     volumes:
-      # Mount entire config directory instead of individual files
-      - type: bind
-        source: ./config
-        target: /etc/freeradius/mods-config/files
-        is_directory: true
-      - type: bind
-        source: ./logs
-        target: /var/log/freeradius
-        is_directory: true
+      - ./config:/etc/freeradius/mods-config/files:ro
+      - ./logs:/var/log/freeradius:rw
     healthcheck:
-      test: ["CMD", "radclient", "-c", "1", "localhost:1812", "status", "testing123"]
-      interval: 30s
+      test: ["CMD-SHELL", "radclient -c 1 127.0.0.1:1812 status testing123 2>&1 | grep -q 'Received' || exit 1"]
+      interval: 60s
       timeout: 10s
-      retries: 3
+      retries: 2
+      start_period: 60s
