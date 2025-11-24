@@ -13,15 +13,7 @@ services:
     environment:
       - TZ=UTC
     volumes:
-      # Optional: mount only logs volume (not config)
       - freeradius_logs:/var/log/freeradius
-    # Simpler health check without radclient
-    healthcheck:
-      test: ["CMD", "test", "-f", "/var/run/radiusd/radiusd.pid"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
 
 volumes:
   freeradius_logs:
