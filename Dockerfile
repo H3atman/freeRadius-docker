@@ -1,15 +1,6 @@
 FROM freeradius/freeradius-server:latest
-
-# Copy configuration files INTO the image
-COPY raddb/clients.conf /etc/freeradius/clients.conf
-COPY raddb/mods-config/files/authorize /etc/freeradius/mods-config/files/authorize
-
-# Set proper permissions
-RUN chmod 644 /etc/freeradius/clients.conf && \
-    chmod 644 /etc/freeradius/mods-config/files/authorize
-
-# Expose RADIUS ports
-EXPOSE 1812/udp 1813/udp
-
-# Run FreeRADIUS in DEBUG mode (logs to stdout)
-CMD ["radiusd", "-f", "-X"]
+RUN apt update
+RUN apt install -y mysql-client
+COPY raddb/mods-available/sql /etc/raddb/mods-enabled/sql
+COPY raddb/sites-available/default /etc/raddb/sites-available/default
+COPY raddb/sites-available/inner-tunnel /etc/raddb/sites-available/inner-tunnel

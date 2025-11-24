@@ -1,20 +1,18 @@
-version: '3.8'
+version: '3.1'
 
 services:
-  freeradius:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: freeradius
+  db:
+    image: mariadb
     restart: unless-stopped
-    ports:
-      - "1812:1812/udp"
-      - "1813:1813/udp"
     environment:
-      - TZ=UTC
+      - MYSQL_ROOT_PASSWORD
+      - MYSQL_DATABASE
+      - MYSQL_USER
+      - MYSQL_PASSWORD
     volumes:
-      - freeradius_logs:/var/log/freeradius
-
-volumes:
-  freeradius_logs:
-    driver: local
+      - ./raddb/sql:/docker-entrypoint-initdb.d
+  radius:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      - db
