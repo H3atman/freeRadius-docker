@@ -1,6 +1,22 @@
 FROM freeradius/freeradius-server:latest
-RUN apt update
-RUN apt install -y mysql-client
-COPY raddb/mods-available/sql /etc/raddb/mods-enabled/sql
-COPY raddb/sites-available/default /etc/raddb/sites-available/default
-COPY raddb/sites-available/inner-tunnel /etc/raddb/sites-available/inner-tunnel
+
+# Copy configuration files
+COPY raddb/clients.conf /etc/freeradius/clients.conf
+COPY raddb/mods-available/sql /etc/freeradius/mods-available/sql
+COPY raddb/mods-config/sql/main/mysql/queries.conf /etc/freeradius/mods-config/sql/main/mysql/queries.conf
+COPY raddb/radiusd.conf.d/logging.conf /etc/freeradius/radiusd.conf.d/logging.conf
+
+# Enable SQL module
+RUN ln -s /etc/freeradius/mods-available/sql /etc/freeradius/mods-enabled/sql
+
+# Enable SQL in default site
+RUN sed -i '/^#.*sql$/s/^#//' /etc/freeradius/sites-available/default
+
+# Set permissions
+RUN chmod 644 /etc/freeradius/clients.conf && \
+    chmod 644 /etc/freeradius/mods-available/sql && \
+    chmod 644 /etc/freeradius/radiusd.conf.d/logging.conf
+
+EXPOSE 1812/udp 1813/udp
+
+CMD ["radiusd", "-f"]

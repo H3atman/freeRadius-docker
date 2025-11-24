@@ -1,18 +1,54 @@
-version: '3.1'
+version: '3.8'
 
 services:
-  db:
-    image: mariadb
+  freeradius:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: freeradius
+    restart: unless-stopped
+    ports:
+      - "1812:1812/udp"
+      - "1813:1813/udp"
+    environment:
+      - TZ=${TZ}
+    volumes:
+      - freeradius_logs:/var/log/freeradius
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - radius_network
+
+  mysql:
+    image: mysql:8.0
+    container_name: freeradius_mysql
     restart: unless-stopped
     environment:
-      - MYSQL_ROOT_PASSWORD
-      - MYSQL_DATABASE
-      - MYSQL_USER
-      - MYSQL_PASSWORD
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
     volumes:
-      - ./raddb/sql:/docker-entrypoint-initdb.d
-  radius:
-    build: .
-    restart: unless-stopped
-    depends_on:
-      - db
+      - mysql_data:/var/lib/mysql
+      - ./raddb/mods-config/sql/main/mysql/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./sql-init/init-users.sql:/docker-entrypoint-initdb.d/02-init-users.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - radius_network
+
+volumes:
+  freeradius_logs:
+    driver: local
+  mysql_data:
+    driver: local
+
+networks:
+  radius_network:
+    driver: bridge
