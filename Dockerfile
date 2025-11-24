@@ -1,22 +1,24 @@
 FROM freeradius/freeradius-server:latest
 
-# Copy configuration files
+# Copy configuration files INTO the image
 COPY raddb/clients.conf /etc/freeradius/clients.conf
-COPY raddb/mods-available/sql /etc/freeradius/mods-available/sql
-COPY raddb/mods-config/sql/main/mysql/queries.conf /etc/freeradius/mods-config/sql/main/mysql/queries.conf
+COPY raddb/mods-config/files/authorize /etc/freeradius/mods-config/files/authorize
 COPY raddb/radiusd.conf.d/logging.conf /etc/freeradius/radiusd.conf.d/logging.conf
 
 # Enable SQL module
-RUN ln -s /etc/freeradius/mods-available/sql /etc/freeradius/mods-enabled/sql
+RUN ln -s /etc/freeradius/mods-available/sql /etc/freeradius/mods-enabled/sql && \
+    ln -s /etc/freeradius/mods-available/sqlcounter /etc/freeradius/mods-enabled/sqlcounter
 
-# Enable SQL in default site
-RUN sed -i '/^#.*sql$/s/^#//' /etc/freeradius/sites-available/default
+# Copy SQL module configuration
+COPY raddb/mods-config/sql/default /etc/freeradius/mods-available/
 
-# Set permissions
+# Set proper permissions
 RUN chmod 644 /etc/freeradius/clients.conf && \
-    chmod 644 /etc/freeradius/mods-available/sql && \
+    chmod 644 /etc/freeradius/mods-config/files/authorize && \
     chmod 644 /etc/freeradius/radiusd.conf.d/logging.conf
 
+# Expose RADIUS ports
 EXPOSE 1812/udp 1813/udp
 
+# Run in foreground
 CMD ["radiusd", "-f"]
