@@ -1,13 +1,32 @@
 sql {
     dialect = "mysql"
     driver = "rlm_sql_${dialect}"
+
+    # Database connection
+    # Note: FreeRADIUS doesn't expand env vars at config parse time
+    # These must match your docker-compose environment
     server = "mysql"
     port = 3306
-    login = "${env:MYSQL_USER}"
-    password = "${env:MYSQL_PASSWORD}"
-    radius_db = "${env:MYSQL_DATABASE}"
+    login = "radius"
+    password = "mysqlpass"
+    radius_db = "radius"
+
+    # Table names for queries.conf
+    acct_table1 = "radacct"
+    acct_table2 = "radacct"
+    postauth_table = "radpostauth"
+    authcheck_table = "radcheck"
+    groupcheck_table = "radgroupcheck"
+    authreply_table = "radreply"
+    groupreply_table = "radgroupreply"
+    usergroup_table = "radusergroup"
+
+    # Read NAS clients from database
     read_clients = yes
     client_table = "nas"
+
+    # Delete stale sessions
+    delete_stale_sessions = yes
 
     # Connection pool settings
     pool {
