@@ -1,12 +1,8 @@
-sql {
-    dialect = "mysql"
-    driver = "rlm_sql_mysql"
-    server = "mysql"
-    port = 3306
-    login = "${env:MYSQL_USER}"
-    password = "${env:MYSQL_PASSWORD}"
-    radius_db = "${env:MYSQL_DATABASE}"
-    read_clients = yes
-    client_table = "nas"
-    # Additional MySQL options if needed
-}
+dialect = "mysql"
+driver = "rlm_sql_mysql"
+server = "mysql"
+login = "${env:MYSQL_USER}"
+password = "${env:MYSQL_PASSWORD}"
+radius_db = "${env:MYSQL_DATABASE}"
+read_clients = yes
+client_table = "nas"

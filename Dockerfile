@@ -20,3 +20,5 @@ EXPOSE 1812/udp 1813/udp
 
 # Run in foreground
 CMD ["radiusd", "-X", "-f"]
+
+
