@@ -21,6 +21,9 @@ sql {
     groupreply_table = "radgroupreply"
     usergroup_table = "radusergroup"
 
+    # Group membership attribute used in SQL queries
+    group_attribute = "SQL-Group"
+
     # Read NAS clients from database
     read_clients = yes
     client_table = "nas"
