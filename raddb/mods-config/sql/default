@@ -1,8 +1,23 @@
-dialect = "mysql"
-driver = "rlm_sql_mysql"
-server = "mysql"
-login = "${env:MYSQL_USER}"
-password = "${env:MYSQL_PASSWORD}"
-radius_db = "${env:MYSQL_DATABASE}"
-read_clients = yes
-client_table = "nas"
+sql {
+    dialect = "mysql"
+    driver = "rlm_sql_mysql"
+    server = "mysql"
+    port = 3306
+    login = "${env:MYSQL_USER}"
+    password = "${env:MYSQL_PASSWORD}"
+    radius_db = "${env:MYSQL_DATABASE}"
+    read_clients = yes
+    client_table = "nas"
+
+    # Enable accounting and authentication SQL
+    accounting = yes
+    authentication = yes
+
+    # Connection settings
+    reconnect = yes
+    retry_delay = 60
+
+    # SQL query files location (use defaults or customize if needed)
+    # These usually refer to radcheck, radreply, radacct, etc. SQL queries
+    # You can customize paths if you place sql files differently
+}
