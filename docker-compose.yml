@@ -12,6 +12,9 @@ services:
       - "1813:1813/udp"
     environment:
       - TZ=${TZ}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
     volumes:
       - freeradius_logs:/var/log/freeradius
     depends_on:

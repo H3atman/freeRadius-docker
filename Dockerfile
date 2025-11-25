@@ -6,9 +6,11 @@ COPY raddb/mods-config/files/authorize /etc/freeradius/mods-config/files/authori
 COPY raddb/radiusd.conf.d/logging.conf /etc/freeradius/radiusd.conf.d/logging.conf
 COPY raddb/mods-config/sql/default /etc/freeradius/mods-available/sql
 
-# Enable SQL module (symlinks already exist in image)
-RUN ln -sf /etc/freeradius/mods-available/sql /etc/freeradius/mods-enabled/sql && \
-    ln -sf /etc/freeradius/mods-available/sqlcounter /etc/freeradius/mods-enabled/sqlcounter
+# Enable SQL module with ordered symlinks (00-sql loads before 01-sqlcounter)
+# This ensures ${modules.sql.dialect} is defined before sqlcounter parses it
+RUN rm -f /etc/freeradius/mods-enabled/sql /etc/freeradius/mods-enabled/sqlcounter && \
+    ln -sf /etc/freeradius/mods-available/sql /etc/freeradius/mods-enabled/00-sql && \
+    ln -sf /etc/freeradius/mods-available/sqlcounter /etc/freeradius/mods-enabled/01-sqlcounter
 
 # Set proper permissions
 RUN chmod 644 /etc/freeradius/clients.conf && \

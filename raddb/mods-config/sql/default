@@ -1,6 +1,6 @@
 sql {
     dialect = "mysql"
-    driver = "rlm_sql_mysql"
+    driver = "rlm_sql_${dialect}"
     server = "mysql"
     port = 3306
     login = "${env:MYSQL_USER}"
@@ -9,15 +9,17 @@ sql {
     read_clients = yes
     client_table = "nas"
 
-    # Enable accounting and authentication SQL
-    accounting = yes
-    authentication = yes
+    # Connection pool settings
+    pool {
+        start = 5
+        min = 4
+        max = 32
+        spare = 3
+        uses = 0
+        lifetime = 0
+        idle_timeout = 60
+    }
 
-    # Connection settings
-    reconnect = yes
-    retry_delay = 60
-
-    # SQL query files location (use defaults or customize if needed)
-    # These usually refer to radcheck, radreply, radacct, etc. SQL queries
-    # You can customize paths if you place sql files differently
+    # Include the default queries for MySQL
+    $INCLUDE ${modconfdir}/${.:name}/main/${dialect}/queries.conf
 }
