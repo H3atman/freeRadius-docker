@@ -23,6 +23,7 @@ services:
   mysql:
     image: mysql:8.0
     container_name: freeradius_mysql
+    hostname: mysql
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
@@ -36,10 +37,11 @@ services:
       - ./raddb/sql/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
       - ./sql-init/radius-init.sql:/docker-entrypoint-initdb.d/02-init-data.sql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
       interval: 10s
-      timeout: 5s
-      retries: 5
+      timeout: 10s
+      retries: 10
+      start_period: 30s
     networks:
       - radius_network
 
